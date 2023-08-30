@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, url_for
 import os
-from scripts.constants.global_constants import STATIC_FOLDER_IMAGES
+from scripts.constants.global_constants import STATIC_FOLDER_IMAGES, get_global
 
 saliecy_bp = Blueprint('saliency_bp',__name__)
 
@@ -8,15 +8,10 @@ saliecy_bp = Blueprint('saliency_bp',__name__)
 def saliency():
     if request.method == "GET":
         image_files = [f for f in os.listdir(os.path.join(STATIC_FOLDER_IMAGES, 'split_images')) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-
-        return render_template("apply_saliency.html", images=image_files)
+        num_of_images = str(int(len(image_files)**0.5))
+        print("len of images",num_of_images)
+        # x=get_global()
+        # print("getglobal",x)
+        return render_template("apply_saliency.html", images=image_files,split_type=num_of_images)
     
 
-# @bp.route('/page2', methods=["GET", "POST"])
-# def page2():
-#     if request.method == "GET":
-#         # Get list of all image files from folder1
-#         image_folder = 'sai'
-#         image_files = [f for f in os.listdir(os.path.join(bp.static_folder,'images', 'sai')) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-#         # print(image_files)
-#         return render_template("page2.html", images=image_files)

@@ -10,6 +10,18 @@
       padding: 20px;
       text-align: left;
     }
+    #image-gallery.eight-images {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+}
+
+#image-gallery.sixteen-images {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 10px;
+}
+
   </style>
    <style>
 
@@ -82,11 +94,17 @@
      - <a  class = "button2" href="/image_classification/page5">Get Skeleton</a></li>
   </ul>
 
-  <div id="image-gallery">
+  <!-- <div id="image-gallery">
+    {% for img in images %}
+        <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="100">
+    {% endfor %}
+</div> -->
+<div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
     {% for img in images %}
         <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="100">
     {% endfor %}
 </div>
+
 
 
     <!-- <button id="make-prediction" class="button">Make</button>  -->

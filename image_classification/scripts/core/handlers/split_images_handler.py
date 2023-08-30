@@ -5,7 +5,7 @@ import shutil
 import os
 import cv2
 import numpy as np
-from scripts.constants.global_constants import STATIC_FOLDER_IMAGES
+from scripts.constants.global_constants import STATIC_FOLDER_IMAGES, set_global, global_dimension
 import io
 
 class ImageProcessor:
@@ -15,6 +15,8 @@ class ImageProcessor:
 
     def check_folder(self):
         folder_name = os.path.join(self.static_folder_images, 'split_images')
+        print(os.getcwd())
+        print(folder_name)
         if not os.path.exists(folder_name):
             os.makedirs(folder_name)
         else:
@@ -24,6 +26,8 @@ class ImageProcessor:
 
     def split_images(self, img: np.ndarray, x_break: int, y_break: int, k: str):
         print("inside split_images")
+        set_global(str(x_break))
+        print("globaldimension",global_dimension)
         
         height, width, depth = img.shape
         s_height = ceil(height / y_break)
