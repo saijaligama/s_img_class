@@ -18,15 +18,13 @@ def home_page():
     image_processor = ImageProcessor()
     if request.method == "GET":
         image_processor.check_folder()
-        return render_template("split_images.html")
+        return render_template("home.html")
     
     try:
         if request.method == "POST":
             data = request.json
-            # print(data)
-            # set_global(str(data['x_break']))
             result = image_processor.image_splitter(data)
-            redirect_url = url_for('saliency_bp.saliency') 
+            redirect_url = url_for('split_images_bp.splitimage') 
             return jsonify({"message": "Image processed successfully!", "redirect": redirect_url})
     except Exception as e:
         return jsonify({"error": str(e)})

@@ -15,8 +15,8 @@ def score_function(output):
     # Replace 0 with the desired class index you want to visualize
     return output[:, 0]
 
-path = r"C:\Users\saija\Desktop\Sharma\image_classification\static\sai"
-proj_dir = r"C:\Users\saija\Desktop\Sharma\image_classification\static\new"
+path = r"C:\Users\saija\Desktop\Sharma\image_classification\static\images\split_images"
+proj_dir = r"C:\Users\saija\Desktop\Sharma\image_classification\static\images"
 
 img_files = [os.path.join(path, x) for x in os.listdir(path)]
 

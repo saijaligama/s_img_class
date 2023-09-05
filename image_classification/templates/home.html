@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Classification</title>
+  <!-- <link rel="stylesheet" type="text/css" href="/image_classification/img_static/css/img_style.css"> -->
+  <link rel="stylesheet" type="text/css" href="/static/css/page_style.css">
+
+  <style>
+    .blue-form {
+      background-color: #0f2044;
+      color: white;
+      padding: 20px;
+      text-align: left;
+    }
+  </style>
+   <style>
+
+    .navigation {
+      display: flex;
+      list-style-type: none;
+      padding: 10;
+      margin: 10;
+      justify-content: center;
+    }
+
+    .button2, .button {
+      margin: 0 10px;
+      
+      list-style-type: none;
+      
+    }
+
+    .button2, .button {
+      text-decoration: none;
+      color: #333;
+      padding: 5px;
+      border: 1px solid #333;
+      border-radius: 5px;
+    }
+
+    .button2:hover, .button:hover
+     {
+      background-color: #0f2044;
+      color: #fcb900;
+    }
+    .image-form button {
+      text-decoration: none;
+      color: #333;
+      padding: 5px;
+      border: 1px solid #333;
+      border-radius: 5px;
+    }
+    .button1 {
+        margin: 0 10px;
+    padding: 5px;
+      
+      border-radius: 5px;
+      border: 1px solid #333;
+      background-color: #0f2044;
+      color: #fcb900;
+    }
+
+    
+
+    .file-input-label {
+        text-decoration: none;
+      color: #333;
+      padding: 5px;
+      border: 1px solid #333;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="title">Image Classification</h1>
+  </header>
+  <div>    </div>
+  <ul class="navigation">
+    <li><a class = "button1" href="/"> Enter Image</a> 
+     - <a  class = "button2" href="/split_images">Split Images</a>
+     <a  class = "button2" href="/make_prediction">Make Prediction</a>
+     - <a  class = "button2" href="/apply_saliency">Apply Saliency</a>
+     - <a  class = "button2" href="/image_classification/page4">Reconstruct Image</a>
+     - <a  class = "button2" href="/image_classification/page5">Get Skeleton</a></li>
+  </ul>
+
+  
+
+  <section id="matter-section">
+    <form id="image-form">
+      <!-- Allow adding files one after the other -->
+      <label for="image-upload">Choose an image...</label>
+      <input type="file" id="image-upload" accept=".jpg,.jpeg,.png" multiple onchange="previewImages(event)">
+    </form>
+    <div id="image-preview"></div>
+
+    <form id="image-processing-form">
+      <label for="image-name">Enter image name:</label>
+      <input type="text" id="image-name">
+      <label for="x-size">Enter your X size:</label>
+      <input type="text" id="x-size" placeholder="8*8">
+      <label for="y-size">Enter your Y size:</label>
+      <input type="text" id="y-size" placeholder="8*8">
+      <!-- <input type="submit" value="Submit" onclick="checking()"> -->
+    </form>
+
+    <!-- <button id="make-prediction" class="button">Make</button>  -->
+    <button id="submit-button" class="button" onclick="submitImages()">Split Images</button>
+   <!-- <li> <a  class = "button2" href="/image_classification/page2">Split Images</a></li> -->
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+
+    <script>
+      var base64Strings = []; // Global array to store the base64 strings of all the images
+
+function previewImages(event) {
+    var imagePreview = document.getElementById('image-preview');
+    base64Strings = []; // Clear the array when new images are selected
+
+    var files = event.target.files;
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var reader = new FileReader();
+
+        reader.onload = (function (file) {
+            return function () {
+                var img = new Image();
+                img.src = this.result;
+                img.width = 200; // Set the desired width for the displayed image
+                img.alt = "Uploaded Image";
+                imagePreview.appendChild(img);
+
+                // Store the base64 string in the array, without the data URI prefix
+                base64Strings.push(this.result.split(',')[1]);
+            };
+        })(file);
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+    console.log(base64Strings)
+}
+
+
+
+function submitImages() {
+    // Extracting the image name value from the input element
+    var img_name = document.getElementById("image-name").value;
+    var x_size = document.getElementById('x-size').value;
+    var y_size = document.getElementById('y-size').value;
+
+    // If no image was uploaded, just return (optional, but prevents sending empty data)
+    if (base64Strings.length === 0) {
+        console.error("No image uploaded!");
+        return;
+    }
+
+    // Since only one image is being uploaded, get the first base64 string
+    var base64String = base64Strings[0];
+    
+    var img_dict = {
+        "image_name": img_name,
+        "x_size":x_size,
+        "y_size":y_size,
+        'image': base64String 
+    };
+
+    $.ajax({
+        url: '/',
+        data: JSON.stringify(img_dict),
+        type: 'POST',
+        contentType: "application/json",
+        dataType: 'json',
+        success: function (response) {
+            console.log("success");
+          if(response.redirect){
+            window.location.href = response.redirect;
+          }
+        },
+        error: function (data2) {
+            console.log(data2);
+        }
+    });
+}
+
+
+    </script>
+  </section>
+</body>
+</html>

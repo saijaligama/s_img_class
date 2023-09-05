@@ -88,8 +88,9 @@
   <div>    </div>
   <ul class="navigation">
     <li><a class = "button2" href="/"> Enter Image</a> 
-     - <a  class = "button1" href="/image_classification/page2">Split Images</a>
-     - <a  class = "button2" href="/image_classification/page3">Apply Saliency</a>
+     - <a  class = "button2" href="/split_images">Split Images</a>
+     <a  class = "button2" href="/make_prediction">Make Prediction</a>
+     - <a  class = "button1" href="/apply_saliency">Apply Saliency</a>
      - <a  class = "button2" href="/image_classification/page4">Reconstruct Image</a>
      - <a  class = "button2" href="/image_classification/page5">Get Skeleton</a></li>
   </ul>
@@ -101,7 +102,7 @@
 </div> -->
 <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
     {% for img in images %}
-        <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="100">
+        <img src="{{ url_for('static', filename='images/saliency_images/' + img) }}" alt="Image from folder1" width="100">
     {% endfor %}
 </div>
 
