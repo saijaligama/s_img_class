@@ -110,15 +110,37 @@
 
     <!-- <button id="make-prediction" class="button">Make</button>  -->
     <!-- <button id="submit-button" class="button" onclick="submitImages()">Apply Saliency</button> -->
-    <li> <a  class = "button2" href="/image_classification/page3">Apply Saliency</a></li>
+    <button id="submit-button" class="button" onclick="applySaliency()">Reconstruct Image</button>
 
 
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 
     <script>
+      function applySaliency(){
+    var img_dict = {
+      "image_name": "sai"
+  };
 
-    </script>
+  $.ajax({
+      url: '/apply_saliency',
+      data: JSON.stringify(img_dict),
+      type: 'POST',
+      contentType: "application/json",
+      dataType: 'json',
+      success: function (response) {
+          console.log("success");
+        if(response.redirect){
+          window.location.href = response.redirect;
+        }
+      },
+      error: function (data2) {
+          console.log(data2);
+      }
+  });
+}
+
+  </script>
   </section>
 </body>
 </html>

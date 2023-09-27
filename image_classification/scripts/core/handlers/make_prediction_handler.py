@@ -17,7 +17,7 @@ class ClassifyImages:
         self.model = load_model(model_path, compile=False)
 
     def classify_images(self):
-        for j in range(8): 
+        for j in range(8): # changer to input values
             for i in range(8):
                 img_path = os.path.join(self.input_dir, f"{j}_{i}.png")
                 img = cv2.imread(img_path)
@@ -31,12 +31,12 @@ class ClassifyImages:
                 print(img_path)
 
                 if prediction > 0.2: 
-                    output_dir_human = os.path.join(self.output_dir, 'Human')
+                    output_dir_human = os.path.join(self.output_dir, 'human')
                     if not os.path.exists(output_dir_human):
                         os.mkdir(output_dir_human)
                     cv2.imwrite(os.path.join(output_dir_human, f"{j}_{i}.png"), img)
                 else:
-                    output_dir_non_human = os.path.join(self.output_dir, 'Non_human')
+                    output_dir_non_human = os.path.join(self.output_dir, 'non_human')
                     if not os.path.exists(output_dir_non_human):
                         os.mkdir(output_dir_non_human)
                     cv2.imwrite(os.path.join(output_dir_non_human, f"{j}_{i}.png"), img)

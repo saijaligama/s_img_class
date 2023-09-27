@@ -80,10 +80,29 @@
       border-radius: 5px;
     }
   </style>
+  <style>
+    /* Your existing CSS styles here */
+
+    /* Divide the body into two halves */
+    .split-container {
+      display: flex;
+      width: 100%;
+    }
+
+    .split-half {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .split-half img {
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1 id="title">Image Classification </h1>
+    <h1 id="title">Image Classification</h1>
   </header>
   <div>    </div>
   <ul class="navigation">
@@ -95,52 +114,59 @@
      - <a  class = "button2" href="/image_classification/page5">Get Skeleton</a></li>
   </ul>
 
-  <!-- <div id="image-gallery">
-    {% for img in images %}
-        <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="100">
-    {% endfor %}
-</div> -->
-<div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
-    {% for img in images %}
-        <img src="{{ url_for('static', filename='images/classified_images/human/' + img) }}" alt="Image from folder1" width="100">
-    {% endfor %}
-</div>
+  <div class="split-container">
+    <div class="split-half">
+      <h2>Human</h2>
+      <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}" style="background-color:rgba(0, 128, 0, 0.5)">
+        {% for img in images %}
+          <img src="{{ url_for('static', filename='images/classified_images/human/' + img) }}" alt="Image from folder1" width="100">
+        {% endfor %}
+      </div>
+    </div>
+    <div class="split-half">
+      <h2>Non Human</h2>
+      <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}" style = "background-color: rgba(255, 0, 0, 0.5)">
+        {% for img in non_images %}
+          <img src="{{ url_for('static', filename='images/classified_images/non_human/' + img) }}" alt="Image from folder2" width="100">
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+   <!-- <button id="make-prediction" class="button">Make</button>  -->
+   <button id="submit-button" class="button" onclick="makePrediction()">Apply Saliency</button>
+   <!-- <li> <a  class = "button2" href="/image_classification/page3">Apply Saliency</a></li> -->
 
 
+   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+   <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 
-    <!-- <button id="make-prediction" class="button">Make</button>  -->
-    <button id="submit-button" class="button" onclick="makePrediction()">Apply Saliency</button>
-    <!-- <li> <a  class = "button2" href="/image_classification/page3">Apply Saliency</a></li> -->
+   <script>
+       function makePrediction(){
+     var img_dict = {
+       "image_name": "sai"
+   };
 
+   $.ajax({
+       url: '/make_prediction',
+       data: JSON.stringify(img_dict),
+       type: 'POST',
+       contentType: "application/json",
+       dataType: 'json',
+       success: function (response) {
+           console.log("success");
+         if(response.redirect){
+           window.location.href = response.redirect;
+         }
+       },
+       error: function (data2) {
+           console.log(data2);
+       }
+   });
+ }
 
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+   </script>
 
-    <script>
-        function makePrediction(){
-      var img_dict = {
-        "image_name": "sai"
-    };
-
-    $.ajax({
-        url: '/make_prediction',
-        data: JSON.stringify(img_dict),
-        type: 'POST',
-        contentType: "application/json",
-        dataType: 'json',
-        success: function (response) {
-            console.log("success");
-          if(response.redirect){
-            window.location.href = response.redirect;
-          }
-        },
-        error: function (data2) {
-            console.log(data2);
-        }
-    });
-  }
-
-    </script>
-  </section>
+  <!-- Your other content here -->
 </body>
 </html>

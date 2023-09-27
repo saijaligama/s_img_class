@@ -3,6 +3,18 @@
 <head>
   <title>Image Classification</title>
   <link rel="stylesheet" type="text/css" href="/static/css/page_style.css">
+  
+  <!-- <style>
+    #image-gallery.eight-images, #image-gallery.sixteen-images {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); /* Adjust minmax and width as needed */
+        gap: 10px;
+    }
+</style> -->
+
+  
+  
+  
   <style>
     .blue-form {
       background-color: #0f2044;
@@ -20,7 +32,7 @@
     display: grid;
     grid-template-columns: repeat(16, 1fr);
     gap: 10px;
-}
+} 
 
   </style>
    <style>
@@ -100,11 +112,19 @@
         <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="100">
     {% endfor %}
 </div> -->
-<div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
+
+<!-- <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
     {% for img in images %}
-        <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="100">
+        <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="200" height="150">
     {% endfor %}
+</div> -->
+
+<div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
+  {% for img in images %}
+      <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="200" height="150" class="{{ 'eight-image-style' if split_type == '8' else 'sixteen-image-style' if split_type == '16' else '' }}">
+  {% endfor %}
 </div>
+
 
 
 

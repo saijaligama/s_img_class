@@ -11,8 +11,11 @@ make_prediction_bp = Blueprint('make_prediction_bp',__name__)
 def make_prediction():
     if request.method == "GET":
         image_files = [f for f in os.listdir(os.path.join(CLASSIFIED_IMAGES, 'human')) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-        num_of_images = str(int(len(image_files)**0.5))
-        return render_template("make_prediction.html", images=image_files,split_type=num_of_images)
+        non_image_files = [f for f in os.listdir(os.path.join(CLASSIFIED_IMAGES, 'non_human')) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+        print(os.path.join(CLASSIFIED_IMAGES, 'human'))
+        # num_of_images = str(int(len(image_files)**0.5))
+        # non_num_of_images
+        return render_template("make_prediction.html", images=image_files,non_images = non_image_files,split_type='8')
     elif request.method == "POST":
         saliency_object = ApplySaliency()
         saliency_object.process_images()

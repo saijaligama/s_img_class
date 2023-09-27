@@ -13,16 +13,42 @@ class ImageProcessor:
     def __init__(self, static_folder_images=STATIC_FOLDER_IMAGES):
         self.static_folder_images = static_folder_images
 
-    def check_folder(self):
-        folder_name = os.path.join(self.static_folder_images, 'split_images')
-        print(os.getcwd())
-        print(folder_name)
-        if not os.path.exists(folder_name):
-            os.makedirs(folder_name)
+    # def check_folder(self):
+    #     folder_names
+    #     folder_name = os.path.join(self.static_folder_images, 'split_images')
+    #     print(os.getcwd())
+    #     print(folder_name)
+    #     if not os.path.exists(folder_name):
+    #         os.makedirs(folder_name)
+    #     else:
+    #         for f in os.listdir(folder_name):
+    #             item_path = os.path.join(folder_name, f)
+    #             os.remove(item_path)
+
+    def check_folder(self,dir_path=None, subfolder_names=None):
+        if dir_path == None:
+            dir_path = self.static_folder_images
+            subfolder_names = ['split_images', 'Reconstructed_Images',
+                            'saliency_images','classified_images',
+                            'skeleton_images'] 
         else:
-            for f in os.listdir(folder_name):
-                item_path = os.path.join(folder_name, f)
-                os.remove(item_path)
+            dir_path = os.path.join(self.static_folder_images, 'classified_images')
+            subfolder_names = ['human','non_human']
+
+        for subfolder_name in subfolder_names:
+            subfolder_path = os.path.join(dir_path,subfolder_name)
+
+            if not os.path.exists(subfolder_path):
+                os.makedirs(subfolder_path)  # Create the subfolder if it doesn't exist
+            else:
+                for f in os.listdir(subfolder_path):
+                    item_path = os.path.join(subfolder_path, f)
+                    if os.path.isfile(item_path):
+                        os.remove(item_path) 
+                    else:
+                        self.check_folder(dir_path)
+                    
+
 
     def split_images(self, img: np.ndarray, x_break: int, y_break: int, k: str):
         print("inside split_images")

@@ -7,16 +7,17 @@
 import numpy as np
 import os
 from PIL import Image
+import cv2
 
 
 # In[21]:
 
 
 # The below are inputs for the code
-dir_path = r'C:\Users\jahna\OneDrive\Documents\GitHub\Project\Image_Filter_Reconstruction\Reconstructed_Images'
+dir_path = r'C:\Users\saija\Desktop\Sharma\image_classification\static\images\saliency_images'
 img_split_dim = 8
 # The below are inputs for the code
-output_path_dir = r'C:/Users/jahna/OneDrive/Documents/GitHub/Project/Image_Filter_Reconstruction/Output Images'
+output_path_dir = r'C:\Users\saija\Desktop\Sharma\image_classification\static\images\Reconstructed_Images'
 
 file_list = os.listdir(dir_path)
 
@@ -31,14 +32,50 @@ print(req_shape)
 
 
 # In[32]:
+print(file_list)
+
+#files = {}
+#for each_file in file_list:
+#    file_num, row, col = list(map(int, each_file.split('.')[0].split('_')))
+#    if file_num not in files:
+#        files[file_num] = np.zeros([img_split_dim, img_split_dim], dtype = object)
+#    files[file_num][row][col] = os.path.join(dir_path, each_file)
+   
+
+op_im = np.zeros((1920,1920,3),dtype=np.uint8)
+
+dim_patch = int(1920//img_split_dim)
+
+for each_file in file_list:
+    im = cv2.imread(os.path.join(dir_path, each_file)) 
+    fname = each_file[:-4]
+    pos = fname.split('_') #position
+    pos = list(map(int,pos))
+    assert im.ndim == 3
+    op_im[pos[0]*(dim_patch):(pos[0]+1)*(dim_patch),pos[1]*(dim_patch):(pos[1]+1)*(dim_patch),:] = im
+
+final_comb_image = Image.fromarray(op_im)
+file_name = 'sharma'
+final_comb_image.save(os.path.join(output_path_dir, 'File_{}.png'.format(str(file_name).zfill(2)))) 
 
 
+    
+"""
+
+
+    
 files = {}
 for each_file in file_list:
-    file_num, row, col = list(map(int, each_file.split('.')[0].split('_')))
-    if file_num not in files:
-        files[file_num] = np.zeros([img_split_dim, img_split_dim], dtype = object)
-    files[file_num][row][col] = os.path.join(dir_path, each_file)
+    split_values = each_file.split('.')[0].split('_')
+    if len(split_values) == 2:
+        file_num, row = list(map(int, split_values))
+        col = 0  # if you don't have a column value, you can set it to a default, e.g., 0
+        if file_num not in files:
+            files[file_num] = np.zeros([img_split_dim, img_split_dim], dtype=object)
+        files[file_num][row][col] = os.path.join(dir_path, each_file)
+    else:
+        print(f"Skipped file due to incorrect naming format: {each_file}")
+
 
 
 # In[33]:
@@ -65,5 +102,5 @@ for file_name, file_matrix in files.items():
 # In[ ]:
 
 
-
+"""
 
