@@ -1,70 +1,46 @@
-# import os
-# import warnings
-# import numpy as np
-# warnings.filterwarnings("ignore")
+import cv2
+import numpy as np
+import os
+# from tensorflow.keras.preprocessing.image import img_to_array
+from tensorflow.keras.models import load_model
 
-# # Fetching data
-# path = r"C:\Users\jahna\OneDrive\Documents\GitHub\Project\new_masks\Test\test_cropped_8x8\human"
-# proj_dir = r"C:\Users\jahna\OneDrive\Documents\GitHub\Project\Image_Filter_Reconstruction"
 
-# img_files = [os.path.join(path, x) for x in os.listdir(path)]
+# Import the required constant from your constants module
+from scripts.constants.global_constants import STATIC_FOLDER_IMAGES_SPLITIMAGES,CLASSIFIED_IMAGES,CNN_PREDICTION_MODEL
 
-# # Applying filters
-# import tensorflow as tf
-# from tensorflow.keras.preprocessing.image import img_to_array, load_img
-# from tensorflow.keras.models import model_from_json
-# from skimage.filters import frangi
-# from skimage import color
-# import matplotlib.pyplot as plt
-# from tf_keras_vis.saliency import Saliency
-# from tf_keras_vis.utils import normalize
-# from tf_keras_vis.utils.model_modifiers import ReplaceToLinear
+class ClassifyImages:
 
-# # Load json and create model
-# json_file = open('model.json', 'r')
-# loaded_model_json = json_file.read()
-# json_file.close()
-# loaded_model = model_from_json(loaded_model_json)
+    def __init__(self, input_dir=STATIC_FOLDER_IMAGES_SPLITIMAGES, output_dir = CLASSIFIED_IMAGES, model_path=CNN_PREDICTION_MODEL):
+        self.input_dir = input_dir
+        self.output_dir = output_dir
+        # Consider loading the model only once during initialization
+        self.model = load_model(model_path, compile=False)
 
-# # Load weights into the model
-# loaded_model.load_weights("model.h5")
-# print("Loaded model from disk")
+    def classify_images(self):
+        for j in range(8): # changer to input values
+            for i in range(8):
+                img_path = os.path.join(self.input_dir, f"{j}_{i}.png")
+                img = cv2.imread(img_path)
+                img2 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                img2 = cv2.resize(img2, (120, 120))
+                img2 = np.array(img2)
+                img2 = np.expand_dims(img2, axis=0)
 
-# # Compile the model
-# loaded_model.compile(optimizer='adam',
-#                      loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-#                      metrics=['accuracy'])
+                prediction = self.model.predict(img2)
+                print("prediction", prediction)
+                print(img_path)
 
-# # Visualization 
-# test_sample_img = img_files[1]
-# test_img = load_img(test_sample_img)
-# test_img_array = img_to_array(test_img)
-# test_img_array = np.expand_dims(test_img_array, axis=0)
+                if prediction > 0.2: 
+                    output_dir_human = os.path.join(self.output_dir, 'human')
+                    if not os.path.exists(output_dir_human):
+                        os.mkdir(output_dir_human)
+                    cv2.imwrite(os.path.join(output_dir_human, f"{j}_{i}.png"), img)
+                else:
+                    output_dir_non_human = os.path.join(self.output_dir, 'non_human')
+                    if not os.path.exists(output_dir_non_human):
+                        os.mkdir(output_dir_non_human)
+                    cv2.imwrite(os.path.join(output_dir_non_human, f"{j}_{i}.png"), img)
 
-# # Create Saliency object.
-# saliency = Saliency(loaded_model,
-#                     model_modifier=ReplaceToLinear(),
-#                     clone=False)
-
-# # Generate saliency map
-# saliency_map = saliency(test_img_array,
-#                         tf.keras.losses.MeanSquaredError(),
-#                         smooth_samples=20)  # Use smooth_samples to make result smoother
-# saliency_map = normalize(saliency_map)
-
-# output_path_dir = os.path.join(proj_dir, "Reconstructed_Images")
-# for img in img_files:
-#     image = load_img(img)
-#     img_array = img_to_array(image)
-    
-#     img_array = img_array.astype('float32')
-#     test_img = img_array / 255.
-    
-#     test_gray = color.rgb2gray(test_img)
-#     frangi_img = frangi(test_gray, sigmas=range(1, 6, 2), scale_range=None,
-#                         scale_step=None, alpha=1, beta=1, gamma=150,
-#                         black_ridges=True, mode='reflect', cval=0)
-    
-#     filter_image = saliency_map[0] * frangi_img
-#     output_file_path = os.path.join(output_path_dir, os.path.basename(img))
-#     plt.imsave(output_file_path, filter_image, cmap='binary_r')
+# Example Usage
+# classifier = ImageClassifier()
+# classifier.classify_images()
