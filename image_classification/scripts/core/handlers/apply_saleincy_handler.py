@@ -12,12 +12,13 @@ import numpy as np
 from scripts.constants.global_constants import STATIC_FOLDER_IMAGES
 from scripts.constants.global_constants import JSON_MODEL, CNN_MODEL, CLASSIFIED_IMAGES
 # from constants import base_dir, model_json_path, model_weights_path
+from skimage.transform import resize
 
 class ApplySaliency:
 
-    def __init__(self):
+    def __init__(self, folder_name):
         self.proj_dir = CLASSIFIED_IMAGES
-        self.path = os.path.join(self.proj_dir, "human")
+        self.path = os.path.join(self.proj_dir, folder_name)
         self.img_files = [os.path.join(self.path, x) for x in os.listdir(self.path)]
         
         self.loaded_model = self._load_model(JSON_MODEL, CNN_MODEL)
@@ -37,33 +38,76 @@ class ApplySaliency:
     def score_function(output):
         return output[:, 0]
 
-    def process_images(self):
+    # def process_images(self):
+    #     saliency = Saliency(self.loaded_model,
+    #                         model_modifier=ReplaceToLinear(),
+    #                         clone=False)
+    #     test_sample_img = self.img_files[1]
+    #     test_img = load_img(test_sample_img)
+    #     test_img_array = img_to_array(test_img)
+    #     test_img_array = np.expand_dims(test_img_array, axis=0)
+        
+    #     saliency_map = saliency(self.score_function, test_img_array)
+    #     saliency_map = normalize(saliency_map)
+
+    #     output_path_dir = os.path.join(STATIC_FOLDER_IMAGES, "saliency_images")
+    #     for img in self.img_files:
+    #         self._save_processed_image(img, saliency_map, output_path_dir)
+   
+    def process_images(self,saliency_folder):
         saliency = Saliency(self.loaded_model,
                             model_modifier=ReplaceToLinear(),
                             clone=False)
-        test_sample_img = self.img_files[1]
-        test_img = load_img(test_sample_img)
-        test_img_array = img_to_array(test_img)
-        test_img_array = np.expand_dims(test_img_array, axis=0)
         
-        saliency_map = saliency(self.score_function, test_img_array)
-        saliency_map = normalize(saliency_map)
+        # Define the desired input shape
+        desired_input_shape = (240, 240, 3)
+        
+        output_path_dir = os.path.join(STATIC_FOLDER_IMAGES, saliency_folder)
+        
+        for img_path in self.img_files:
+            # Load and resize the image to the desired shape
+            test_img = load_img(img_path, target_size=desired_input_shape[:2])
+            test_img_array = img_to_array(test_img)
+            test_img_array = np.expand_dims(test_img_array, axis=0)
+            
+            saliency_map = saliency(self.score_function, test_img_array)
+            saliency_map = normalize(saliency_map)
+            
+            self._save_processed_image(img_path, saliency_map, output_path_dir)
 
-        output_path_dir = os.path.join(STATIC_FOLDER_IMAGES, "saliency_images")
-        for img in self.img_files:
-            self._save_processed_image(img, saliency_map, output_path_dir)
+
+        
 
     def _save_processed_image(self, img, saliency_map, output_dir):
         image = load_img(img)
         img_array = img_to_array(image)
         img_array = img_array.astype('float32')
         test_img = img_array / 255.
-        
+
         test_gray = color.rgb2gray(test_img)
         frangi_img = frangi(test_gray, sigmas=range(1, 6, 2), scale_range=None,
                             scale_step=None, alpha=1, beta=1, gamma=150,
                             black_ridges=True, mode='reflect', cval=0)
-        
-        filter_image = saliency_map[0] * frangi_img
+
+        # Resize frangi_img to match the shape of saliency_map[0]
+        frangi_img_resized = resize(frangi_img, saliency_map[0].shape, mode='reflect')
+
+        filter_image = saliency_map[0] * frangi_img_resized
         output_file_path = os.path.join(output_dir, os.path.basename(img))
         plt.imsave(output_file_path, filter_image, cmap='binary_r')
+
+
+    # def _save_processed_image(self, img, saliency_map, output_dir):
+    #     image = load_img(img)
+    #     img_array = img_to_array(image)
+    #     img_array = img_array.astype('float32')
+    #     test_img = img_array / 255.
+        
+    #     test_gray = color.rgb2gray(test_img)
+    #     frangi_img = frangi(test_gray, sigmas=range(1, 6, 2), scale_range=None,
+    #                         scale_step=None, alpha=1, beta=1, gamma=150,
+    #                         black_ridges=True, mode='reflect', cval=0)
+        
+    #     filter_image = saliency_map[0] * frangi_img
+    #     output_file_path = os.path.join(output_dir, os.path.basename(img))
+    #     plt.imsave(output_file_path, filter_image, cmap='binary_r')

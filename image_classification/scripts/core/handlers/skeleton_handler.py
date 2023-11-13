@@ -6,13 +6,16 @@ import os
 from PIL import Image
 import matplotlib.pyplot as plt
 from scripts.constants.global_constants import STATIC_FOLDER_IMAGES
+from flask import session
 
 class SkeletonProcessor:
-    def __init__(self):
-        self.image_path = os.path.join(STATIC_FOLDER_IMAGES,'Reconstructed_Images','File_reconstructed_image.png')
+    def __init__(self,reconstructed_path,skeleton_temp):
+        self.image_path = os.path.join(STATIC_FOLDER_IMAGES,reconstructed_path,'File_reconstructed_image.png')
         self.output_path = os.path.join(STATIC_FOLDER_IMAGES,'skeleton_images')
+        self.skeleton_temp_folder = os.path.join(STATIC_FOLDER_IMAGES,skeleton_temp)
 
-    def process_image(self):
+    def process_image(self,image_name):
+        skeleton_name = image_name
         img = cv2.imread(self.image_path)
 
         sharpen_filter = np.array([[0, -1, 0], [-1, 8, -1], [0, -1, 0]])
@@ -37,7 +40,8 @@ class SkeletonProcessor:
         img_binary = cv2.threshold(skeleton, thresh, 255, cv2.THRESH_BINARY)[1]
 
         img_binary = Image.fromarray(img_binary)
-        img_binary.save(os.path.join(self.output_path, 'skeleton.png'))
+        img_binary.save(os.path.join(self.skeleton_temp_folder, '{}.png'.format(skeleton_name)))
+        img_binary.save(os.path.join(self.output_path, '{}.png'.format(skeleton_name)))
 
     def plot_images(self):
         img = cv2.imread(self.image_path)

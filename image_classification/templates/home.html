@@ -114,6 +114,264 @@
 
     <script>
       var base64Strings = []; // Global array to store the base64 strings of all the images
+      var fileNames = []; // Global array to store the file names
+    
+      function previewImages(event) {
+        var imagePreview = document.getElementById('image-preview');
+        var files = event.target.files;
+    
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var reader = new FileReader();
+    
+          reader.onload = (function (file, index) {
+            return function () {
+              var img = new Image();
+              img.src = this.result;
+              img.width = 200; // Set the desired width for the displayed image
+              img.alt = "Uploaded Image";
+              imagePreview.appendChild(img);
+    
+              // Store the base64 string in the array, without the data URI prefix
+              base64Strings.push(this.result.split(',')[1]);
+    
+              // Store the file name in the fileNames array
+              fileNames.push(file.name.substring(0, file.name.lastIndexOf('.'))); // Extracting file name without extension
+            };
+          })(file, i);
+    
+          if (file) {
+            reader.readAsDataURL(file);
+          }
+        }
+        console.log(base64Strings);
+        console.log(fileNames);
+      }
+    
+      function submitImages() {
+        var x_size = document.getElementById('x-size').value;
+        var y_size = document.getElementById('y-size').value;
+    
+        var images = [];
+    
+        // Loop through the stored base64 strings and file names to create image objects
+        for (var i = 0; i < base64Strings.length; i++) {
+          images.push({
+            "image_name": fileNames[i], // Use extracted file names as image names
+            "x_size": x_size,
+            "y_size": y_size,
+            "image": base64Strings[i]
+          });
+        }
+    
+        var img_dict = { "images": images };
+        console.log(images)
+    
+        // Check if images were uploaded
+        if (base64Strings.length === 0) {
+          console.error("No image uploaded!");
+          return;
+        }
+    
+        // Send the images to the backend
+        $.ajax({
+          url: '/', // Replace with your backend endpoint
+          data: JSON.stringify(img_dict),
+          type: 'POST',
+          contentType: "application/json",
+          dataType: 'json',
+          success: function (response) {
+            console.log("Images uploaded successfully!");
+            if (response.redirect) {
+              window.location.href = response.redirect;
+            }
+          },
+          error: function (data2) {
+            console.log(data2);
+          }
+        });
+      }
+    </script>
+    
+
+    <!-- <script>
+      var base64Strings = []; // Global array to store the base64 strings of all the images
+      var fileNames = []; // Global array to store the file names
+    
+      function previewImages(event) {
+        var imagePreview = document.getElementById('image-preview');
+        base64Strings = []; // Clear the array when new images are selected
+        fileNames = []; // Clear the file names array
+    
+        var files = event.target.files;
+    
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var reader = new FileReader();
+    
+          reader.onload = (function (file, index) {
+            return function () {
+              var img = new Image();
+              img.src = this.result;
+              img.width = 200; // Set the desired width for the displayed image
+              img.alt = "Uploaded Image";
+              imagePreview.appendChild(img);
+    
+              // Store the base64 string in the array, without the data URI prefix
+              base64Strings[index] = this.result.split(',')[1];
+    
+              // Store the file name in the fileNames array
+              fileNames[index] = file.name.substring(0, file.name.lastIndexOf('.')); // Extracting file name without extension
+            };
+          })(file, i);
+    
+          if (file) {
+            reader.readAsDataURL(file);
+          }
+        }
+        console.log(base64Strings);
+        console.log(fileNames);
+      }
+    
+      function submitImages() {
+        var img_name = fileNames; // Use extracted file names as image names
+        var x_size = document.getElementById('x-size').value;
+        var y_size = document.getElementById('y-size').value;
+    
+        var images = [];
+    
+        for (var i = 0; i < base64Strings.length; i++) {
+          images.push({
+            "image_name": img_name[i], // Use extracted file names as image names
+            "x_size": x_size,
+            "y_size": y_size,
+            "image": base64Strings[i]
+          });
+        }
+        console.log(images)
+        var img_dict = { "images": images };
+    
+        // Check if images were uploaded
+        if (base64Strings.length === 0) {
+          console.error("No image uploaded!");
+          return;
+        }
+    
+        // Send the images to the backend
+        $.ajax({
+          url: '/', // Replace with your backend endpoint
+          data: JSON.stringify(img_dict),
+          type: 'POST',
+          contentType: "application/json",
+          dataType: 'json',
+          success: function (response) {
+            console.log("Images uploaded successfully!");
+            if (response.redirect) {
+              window.location.href = response.redirect;
+            }
+          },
+          error: function (data2) {
+            console.log(data2);
+          }
+        });
+      }
+    </script> -->
+    
+
+    <!-- <script>
+
+var base64Strings = []; // Global array to store the base64 strings of all the images
+var fileNames = []; // Global array to store the file names
+
+function previewImages(event) {
+    var imagePreview = document.getElementById('image-preview');
+    base64Strings = []; // Clear the array when new images are selected
+    fileNames = []; // Clear the array for file names
+    imagePreview.innerHTML = ''; // Clear previously displayed images
+
+    var files = event.target.files;
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var reader = new FileReader();
+
+        reader.onload = (function (file) {
+            return function () {
+                var img = new Image();
+                img.src = this.result;
+                img.width = 200; // Set the desired width for the displayed image
+                img.alt = "Uploaded Image";
+                imagePreview.appendChild(img);
+
+                // Store the base64 string in the array, without the data URI prefix
+                base64Strings.push(this.result.split(',')[1]);
+
+                // Store the file name in the array
+                fileNames.push(file.name);
+            };
+        })(file);
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+    console.log(base64Strings);
+    console.log(fileNames);
+}
+
+function submitImages() {
+    if (base64Strings.length === 0) {
+        console.error("No image uploaded!");
+        return;
+    }
+
+    if (base64Strings.length !== fileNames.length) {
+        console.error("Number of images and file names do not match!");
+        return;
+    }
+
+    var img_dicts = [];
+
+    for (var i = 0; i < base64Strings.length; i++) {
+        var img_name = fileNames[i]; // Using the file name as the image name
+        var x_size = document.getElementById('x-size').value;
+        var y_size = document.getElementById('y-size').value;
+
+        var img_dict = {
+            "image_name": img_name,
+            "x_size": x_size,
+            "y_size": y_size,
+            'image': base64Strings[i] // Sending individual base64 string
+        };
+
+        img_dicts.push(img_dict);
+    }
+
+    // Send each image data separately (as a list of dictionaries) to the backend
+    img_dicts.forEach(function (img_dict) {
+        $.ajax({
+            url: '/',
+            data: JSON.stringify(img_dict),
+            type: 'POST',
+            contentType: "application/json",
+            dataType: 'json',
+            success: function (response) {
+                console.log("success");
+                if (response.redirect) {
+                    window.location.href = response.redirect;
+                }
+            },
+            error: function (data2) {
+                console.log(data2);
+            }
+        });
+    });
+}
+
+
+    </script> -->
+
+    <!-- <script>
+      var base64Strings = []; // Global array to store the base64 strings of all the images
 
 function previewImages(event) {
     var imagePreview = document.getElementById('image-preview');
@@ -159,13 +417,13 @@ function submitImages() {
     }
 
     // Since only one image is being uploaded, get the first base64 string
-    var base64String = base64Strings[0];
+    var base64String = base64Strings;
     
     var img_dict = {
         "image_name": img_name,
         "x_size":x_size,
         "y_size":y_size,
-        'image': base64String 
+        'image': base64Strings
     };
 
     $.ajax({
@@ -187,7 +445,9 @@ function submitImages() {
 }
 
 
-    </script>
+    </script> -->
+
+
   </section>
 </body>
 </html>
