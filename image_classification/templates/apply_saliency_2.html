@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Classification</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/page_style.css">
+  <style>
+    .blue-form {
+      background-color: #0f2044;
+      color: white;
+      padding: 20px;
+      text-align: left;
+    }
+    #image-gallery.eight-images {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+}
+
+#image-gallery.sixteen-images {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 10px;
+}
+
+  </style>
+   <style>
+
+    .navigation {
+      display: flex;
+      list-style-type: none;
+      padding: 10;
+      margin: 10;
+      justify-content: center;
+    }
+
+    .button2, .button {
+      margin: 0 10px;
+      
+      list-style-type: none;
+      
+    }
+
+    .button2, .button {
+      text-decoration: none;
+      color: #333;
+      padding: 5px;
+      border: 1px solid #333;
+      border-radius: 5px;
+    }
+
+    .button2:hover, .button:hover
+     {
+      background-color: #0f2044;
+      color: #fcb900;
+    }
+    .image-form button {
+      text-decoration: none;
+      color: #333;
+      padding: 5px;
+      border: 1px solid #333;
+      border-radius: 5px;
+    }
+    .button1 {
+        margin: 0 10px;
+    padding: 5px;
+      
+      border-radius: 5px;
+      border: 1px solid #333;
+      background-color: #0f2044;
+      color: #fcb900;
+    }
+
+    
+
+    .file-input-label {
+        text-decoration: none;
+      color: #333;
+      padding: 5px;
+      border: 1px solid #333;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="title">Image Classification </h1>
+  </header>
+  <div>    </div>
+  <ul class="navigation">
+    <li><a class = "button2" href="/"> Enter Image</a> 
+     - <a  class = "button2" href="/split_images">Split Images</a>
+     <a  class = "button2" href="/make_prediction">Make Prediction</a>
+     - <a  class = "button1" href="/apply_saliency">Apply Saliency</a>
+     - <a  class = "button2" href="/image_classification/page4">Reconstruct Image</a>
+     - <a  class = "button2" href="/image_classification/page5">Get Skeleton</a></li>
+  </ul>
+
+  <!-- <div id="image-gallery">
+    {% for img in images %}
+        <img src="{{ url_for('static', filename='images/split_images/' + img) }}" alt="Image from folder1" width="100">
+    {% endfor %}
+</div> -->
+<div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
+    {% for img in images %}
+        <img src="{{ url_for('static', filename='images/saliency_images/' + img) }}" alt="Image from folder1" width="100">
+    {% endfor %}
+</div>
+<div>
+    <br>
+</div>
+<div>
+    <h3>Image 2</h3>
+</div>
+<div>
+    <br>
+</div>
+
+<div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
+    {% for img in images2 %}
+        <img src="{{ url_for('static', filename='images/saliency_images_2/' + img) }}" alt="Image from folder2" width="100">
+    {% endfor %}
+</div>
+
+
+
+    <!-- <button id="make-prediction" class="button">Make</button>  -->
+    <!-- <button id="submit-button" class="button" onclick="submitImages()">Apply Saliency</button> -->
+    <button id="submit-button" class="button" onclick="applySaliency()">Reconstruct Image</button>
+
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+
+    <script>
+      function applySaliency(){
+    var img_dict = {
+      "image_name": "sai"
+  };
+
+  $.ajax({
+      url: '/apply_saliency',
+      data: JSON.stringify(img_dict),
+      type: 'POST',
+      contentType: "application/json",
+      dataType: 'json',
+      success: function (response) {
+          console.log("success");
+        if(response.redirect){
+          window.location.href = response.redirect;
+        }
+      },
+      error: function (data2) {
+          console.log(data2);
+      }
+  });
+}
+
+  </script>
+  </section>
+</body>
+</html>

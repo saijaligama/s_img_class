@@ -102,7 +102,7 @@
 </div> -->
 <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
     {% for img in images %}
-        <img src="{{ url_for('static', filename='images/skeleton_images/' + img) }}" alt="Image from folder1" width="500">
+        <img src="{{ url_for('static', filename='images/skeleton_temp/' + img) }}" alt="Image from folder1" width="500">
     {% endfor %}
 </div>
 
@@ -111,14 +111,38 @@
     <!-- <button id="make-prediction" class="button">Make</button>  -->
     <!-- <button id="submit-button" class="button" onclick="submitImages()">Apply Saliency</button> -->
     <!-- <button id="submit-button" class="button" onclick="reconstructImage()">Reconstruct Image</button> -->
+    <button id="submit-button" class="button" onclick="find_correlation()"> Get Correlation </button>
 
 
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
 
     <script>
+      function find_correlation(){
+  var img_dict = {
+    "image_name": "sai",
+    "corr_coef":0.5
+};
 
-    </script>
+$.ajax({
+    url: '/skeleton',
+    data: JSON.stringify(img_dict),
+    type: 'POST',
+    contentType: "application/json",
+    dataType: 'json',
+    success: function (response) {
+        console.log("success");
+      if(response.redirect){
+        window.location.href = response.redirect;
+      }
+    },
+    error: function (data2) {
+        console.log(data2);
+    }
+});
+}
+
+  </script>
   </section>
 </body>
 </html>

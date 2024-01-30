@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from scripts.constants.global_constants import STATIC_FOLDER_IMAGES, set_global, global_dimension
 import io
+from flask import session
 
 class ImageProcessor:
 
@@ -25,15 +26,25 @@ class ImageProcessor:
     #             item_path = os.path.join(folder_name, f)
     #             os.remove(item_path)
 
+    def save_image(image):
+        print("inside images")
+        base64_decoded = base64.b64decode(image["image"])
+        img = Image.open(io.BytesIO(base64_decoded))
+        out_path = os.path.join(STATIC_FOLDER_IMAGES,'uploaded_images')
+        img.save("{}/{}.{}".format(out_path,image['image_name'],'png'))
+
     def check_folder(self,dir_path=None, subfolder_names=None):
         if dir_path == None:
             dir_path = self.static_folder_images
             subfolder_names = ['split_images', 'Reconstructed_Images',
                             'saliency_images','classified_images',
-                            'skeleton_images'] 
+                            'skeleton_temp','correlation_images',
+                            'split_images_2','saliency_images_2',
+                            'Reconstructed_Images_2','skeleton_temp_2',
+                            'uploaded_images'] 
         else:
             dir_path = os.path.join(self.static_folder_images, 'classified_images')
-            subfolder_names = ['human','non_human']
+            subfolder_names = ['human','non_human','combined','human_2','non_human_2','combined_2']
 
         for subfolder_name in subfolder_names:
             subfolder_path = os.path.join(dir_path,subfolder_name)
@@ -50,34 +61,62 @@ class ImageProcessor:
                     
 
 
-    def split_images(self, img: np.ndarray, x_break: int, y_break: int, k: str):
-        print("inside split_images")
-        set_global(str(x_break))
-        print("globaldimension",global_dimension)
+    # def split_images(self, img: np.ndarray, x_break: int, y_break: int, k: str):
+    #     # print("inside split_images")
+    #     # set_global(str(x_break))
+    #     # print("globaldimension",global_dimension)
+        
+    #     height, width, depth = img.shape
+    #     s_height = ceil(height / y_break)
+    #     s_width = ceil(width / x_break)
+
+    #     output_dir = os.path.join(self.static_folder_images, 'split_images')
+    #     # if os.path.exists(output_dir):  # Using os.path.exists instead of genericpath.exists for consistency
+    #     #     shutil.rmtree(output_dir)
+    #     # if not os.path.exists(output_dir):
+    #     #     os.mkdir(output_dir)
+
+    #     # for k1 in range(session['num_of_images']):
+    #     for i in range(y_break):
+    #         for j in range(x_break):
+    #             temp = img[i * s_height:(i + 1) * s_height, j * s_width:(j + 1) * s_width]
+    #             cv2.imwrite("{}/{}_{}_{}.png".format(output_dir, k,i, j), temp)
+        
+    #     return output_dir
+
+    def split_images(self, img: np.ndarray, x_break: int, y_break: int, k: str, folder_name):
+        # print("inside split_images")
+        # set_global(str(x_break))
+        # print("globaldimension",global_dimension)
         
         height, width, depth = img.shape
         s_height = ceil(height / y_break)
         s_width = ceil(width / x_break)
 
-        output_dir = os.path.join(self.static_folder_images, 'split_images')
-        if os.path.exists(output_dir):  # Using os.path.exists instead of genericpath.exists for consistency
-            shutil.rmtree(output_dir)
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
+        output_dir = os.path.join(self.static_folder_images, folder_name)
+        # if os.path.exists(output_dir):  # Using os.path.exists instead of genericpath.exists for consistency
+        #     shutil.rmtree(output_dir)
+        # if not os.path.exists(output_dir):
+        #     os.mkdir(output_dir)
 
+        # for k1 in range(session['num_of_images']):
         for i in range(y_break):
             for j in range(x_break):
                 temp = img[i * s_height:(i + 1) * s_height, j * s_width:(j + 1) * s_width]
-                cv2.imwrite("{}/{}_{}.png".format(output_dir, i, j), temp)
+                cv2.imwrite("{}/{}_{}_{}.png".format(output_dir, k,i, j), temp)
         
         return output_dir
 
-    def image_splitter(self, data):
+    def image_splitter(self, data,folder_name):
         base64_decoded = base64.b64decode(data["image"])
         img = Image.open(io.BytesIO(base64_decoded))
-        image_np = np.array(img)
+        temp = np.array(img)
+        image_np = np.zeros_like(temp)
+        image_np[:,:,0] = temp[:,:,2]
+        image_np[:,:,1] = temp[:,:,1]
+        image_np[:,:,2] = temp[:,:,0]
         print(type(img))
-        out_fol = self.split_images(image_np, int(data['x_size']), int(data['y_size']), data['image_name'])
+        out_fol = self.split_images(image_np, int(data['x_size']), int(data['y_size']), data['image_name'],folder_name)
         return out_fol
 
 

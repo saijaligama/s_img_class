@@ -114,10 +114,10 @@
      - <a  class = "button2" href="/image_classification/page5">Get Skeleton</a></li>
   </ul>
 
-  <div class="split-container">
+  <!-- <div class="split-container">
     <div class="split-half">
       <h2>Human</h2>
-      <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}" style="background-color:rgba(0, 128, 0, 0.5)">
+      <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}" >
         {% for img in images %}
           <img src="{{ url_for('static', filename='images/classified_images/human/' + img) }}" alt="Image from folder1" width="100">
         {% endfor %}
@@ -125,13 +125,19 @@
     </div>
     <div class="split-half">
       <h2>Non Human</h2>
-      <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}" style = "background-color: rgba(255, 0, 0, 0.5)">
+      <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
         {% for img in non_images %}
           <img src="{{ url_for('static', filename='images/classified_images/non_human/' + img) }}" alt="Image from folder2" width="100">
         {% endfor %}
       </div>
     </div>
+  </div> -->
+  <div id="image-gallery" class="{{ 'eight-images' if split_type == '8' else 'sixteen-images' if split_type == '16' else '' }}">
+    {% for img in images %}
+        <img src="{{ url_for('static', filename='images/classified_images/combined/' + img) }}" alt="Image from folder1" width="200" height="150" class="{{ 'eight-image-style' if split_type == '8' else 'sixteen-image-style' if split_type == '16' else '' }}">
+    {% endfor %}
   </div>
+  
 
    <!-- <button id="make-prediction" class="button">Make</button>  -->
    <button id="submit-button" class="button" onclick="makePrediction()">Apply Saliency</button>
